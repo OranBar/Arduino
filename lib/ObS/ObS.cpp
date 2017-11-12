@@ -48,6 +48,9 @@ void ObS::bootAnim(int ledpin){
 #ifdef Verbose
     Serial.println("Booting >>>>");
 #endif
+    //Wait a sec before starting
+    sleep(500);
+
     int delays[] = {1200,800,100,100,100,100,50,50,50,50,50,50};
     bool ledOn = false;
     int i = 0;
@@ -60,6 +63,10 @@ void ObS::bootAnim(int ledpin){
 #ifdef Verbose
     Serial.println("Booting <<<<<");
 #endif
+
+    //Wait a sec, for good measure
+    sleep(100);
+
 }
 
 void ObS::flashLed(int pin, int times, int delayMillis){

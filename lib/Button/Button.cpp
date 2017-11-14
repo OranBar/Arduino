@@ -2,13 +2,6 @@
 #define Button_h
 #include "Button.h"
 
-int pin;
-bool buttonWasPressed;
-bool buttonWasReleased;
-int lastPressTime;
-int lastPressDuration;
-
-
 Button::Button(int buttonPin){
     pin = buttonPin;
     pinMode(pin, OUTPUT); //make that pin an OUTPUT

@@ -1,9 +1,7 @@
 #include "ObS.h" //include the declaration for this class
 
 
-bool rebooted;
-bool off;
-Button* onOffButton;
+
 
 ObS::ObS(){
    pinMode(ObS_PIN, OUTPUT); //make that pin an OUTPUT

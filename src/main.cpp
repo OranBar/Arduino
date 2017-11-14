@@ -56,181 +56,185 @@ bool off;
  
 #define FADESPEED 5     // make this higher to slow down
  
-void setup() {
-  pinMode(Red, OUTPUT);
-  pinMode(Green, OUTPUT);
-  pinMode(Blue, OUTPUT);
+// void setup() {
+//   pinMode(Red, OUTPUT);
+//   pinMode(Green, OUTPUT);
+//   pinMode(Blue, OUTPUT);
 
-  button = new Button(ButtonPin);
-  analogWrite(Red, 255);
-  off = true;
-}
- 
- 
-void loop() {
-    button->loop();
-    if(button->buttonWasPressed){
-        off = !off;
-        obs.flashLed(ObS_PIN, 3, 150);
-    }
-    if (off){
-        return;
-    }
-    int r, g, b;
-
-    // fade from blue to violet
-    for (r = 0; r < 256; r++)
-    {
-        analogWrite(Red, r);
-        delay(FADESPEED);
-    }
-    // fade from violet to red
-    for (b = 255; b > 0; b--)
-    {
-        analogWrite(Blue, b);
-        delay(FADESPEED);
-    }
-    // fade from red to yellow
-    for (g = 0; g < 256; g++)
-    {
-        analogWrite(Green, g);
-        delay(FADESPEED);
-    }
-    // fade from yellow to green
-    for (r = 255; r > 0; r--)
-    {
-        analogWrite(Red, r);
-        delay(FADESPEED);
-    }
-    // fade from green to teal
-    for (b = 0; b < 256; b++)
-    {
-        analogWrite(Blue, b);
-        delay(FADESPEED);
-    }
-    // fade from teal to blue
-    for (g = 255; g > 0; g--)
-    {
-        analogWrite(Green, g);
-        delay(FADESPEED);
-    }
-}
-
-// void setup(){
-//     Serial.begin(9600);
-
-//     motionSensor = new MotionSensor(MotionSensonPin, OnMotionDetected);
-//     rgbLeds = new RGBLeds(Red, Green, Blue);
-//     button = new Button(ButtonPin);
-//     pinMode(MotionSensonPin, INPUT);
-
-//     obs.bootAnim(SignalLed);
-
-//     rgbLeds->setColor(0, 0, 0); 
-
-//     //Init led strip
-//     /*
-//     byte pins[] = {Red, Green, Blue};
-//     rgbStrip.initTLC5940(3,  pins);
-//     rgbStrip.setAnimation(ALA_FADECOLORSLOOP, 12000, alaPalRgb);
-//     */
+//   button = new Button(ButtonPin);
+//   analogWrite(Red, 0);
+//   analogWrite(Green, 0);
+//   analogWrite(Blue, 0);
+//   off = true;
 // }
-
-
+ 
+ 
 // void loop() {
-//     // if(obs.OnOffButtonLoop()){
-//     //     return;
-//     // }
-
-
-//     if(digitalRead(ButtonPin)){
-//         obs.flashLed(ObS_PIN, 1, 150);
-        
-//         Serial.println("Common Anode <>");
-//         rgbLeds->setColor(255, 0, 0); // red
-
-//         obs.sleep(2000); 
-
-//         Serial.println("Common Catode <>");
-//         rgbLeds->setColor(0, 255, 255); // red
-
-//         obs.sleep(2000); 
-
-//         Serial.println("Turning OFF lights ><");
-
+//     button->loop();
+//     if(button->buttonWasPressed){
+//         off = !off;
+//         obs.flashLed(ObS_PIN, 3, 150);
 //     }
-
-//     motionSensor->loop();
-//     rgbLeds->loop();
-
-//     if(millis() > turnOffSupportLedTime && supportLedOn){
-//         Serial.print("Time ");
-//         Serial.print(turnOffSupportLedTime);
-//         Serial.println("[Turning LED off] ");
-//         //ToggleSupportLed(false);
+//     if (off){
+//         return;
 //     }
+//     int r, g, b;
+
+//     // fade from blue to violet
+//     for (r = 0; r < 256; r++)
+//     {
+//         analogWrite(Red, r);
+//         delay(FADESPEED);
+//     }
+//     // fade from violet to red
+//     for (b = 255; b > 0; b--)
+//     {
+//         analogWrite(Blue, b);
+//         delay(FADESPEED);
+//     }
+//     // fade from red to yellow
+//     for (g = 0; g < 256; g++)
+//     {
+//         analogWrite(Green, g);
+//         delay(FADESPEED);
+//     }
+//     // fade from yellow to green
+//     for (r = 255; r > 0; r--)
+//     {
+//         analogWrite(Red, r);
+//         delay(FADESPEED);
+//     }
+//     // fade from green to teal
+//     for (b = 0; b < 256; b++)
+//     {
+//         analogWrite(Blue, b);
+//         delay(FADESPEED);
+//     }
+//     // fade from teal to blue
+//     for (g = 255; g > 0; g--)
+//     {
+//         analogWrite(Green, g);
+//         delay(FADESPEED);
+//     }
+// }
+
+void setup(){
+    // Serial.begin(9600);
+
+    // motionSensor = new MotionSensor(MotionSensonPin, OnMotionDetected);
+    rgbLeds = new RGBLeds(Red, Green, Blue);
+    // button = new Button(ButtonPin);
+    // pinMode(MotionSensonPin, INPUT);
+
+    // obs.bootAnim(SignalLed);
     
-//     // if(digitalRead(MotionSensonPin) == HIGH){
-//     //     Serial.println("Motion Detected");
+    analogWrite(Red, 0);
+    analogWrite(Green, 0);
+    analogWrite(Blue, 0);
+
+    //Init led strip
+    /*
+    byte pins[] = {Red, Green, Blue};
+    rgbStrip.initTLC5940(3,  pins);
+    rgbStrip.setAnimation(ALA_FADECOLORSLOOP, 12000, alaPalRgb);
+    */
+}
+
+
+void loop() {
+    // // if(obs.OnOffButtonLoop()){
+    // //     return;
+    // // }
+
+
+    // if(digitalRead(ButtonPin)){
+    //     obs.flashLed(ObS_PIN, 1, 150);
         
-//     //     if(motionDetected == false){
-//     //         Serial.println("MOTION");
-//     //         OnMotionDetected();
-//     //         motionDetected = true;
-//     //         obs.sleep(6000); //6000 + 2000 = 8000. i've never seen a 8000.
-//     //     }
-//     // }
-//     // else
-//     // {
-//     //     if(motionDetected){ motionDetected = false; }
-//     // }
+    //     Serial.println("Common Anode <>");
+    //     rgbLeds->setColor(255, 0, 0); // red
 
-//     obs.sleep(LoopRate);
-// }
+    //     obs.sleep(2000); 
+
+    //     Serial.println("Common Catode <>");
+    //     rgbLeds->setColor(0, 255, 255); // red
+
+    //     obs.sleep(2000); 
+
+    //     Serial.println("Turning OFF lights ><");
+
+    // }
+
+    // motionSensor->loop();
+    // rgbLeds->loop();
+
+    // if(millis() > turnOffSupportLedTime && supportLedOn){
+    //     Serial.print("Time ");
+    //     Serial.print(turnOffSupportLedTime);
+    //     Serial.println("[Turning LED off] ");
+    //     //ToggleSupportLed(false);
+    // }
+    
+    // // if(digitalRead(MotionSensonPin) == HIGH){
+    // //     Serial.println("Motion Detected");
+        
+    // //     if(motionDetected == false){
+    // //         Serial.println("MOTION");
+    // //         OnMotionDetected();
+    // //         motionDetected = true;
+    // //         obs.sleep(6000); //6000 + 2000 = 8000. i've never seen a 8000.
+    // //     }
+    // // }
+    // // else
+    // // {
+    // //     if(motionDetected){ motionDetected = false; }
+    // // }
+
+    // obs.sleep(LoopRate);
+}
 
 
 
-// void OnMotionDetected(){
-//     lastMotion_time = millis();
-//     Serial.println(lastMotion_time);
-//     obs.flashLed(TrackingLed, 3, 150);
+void OnMotionDetected(){
+    lastMotion_time = millis();
+    Serial.println(lastMotion_time);
+    obs.flashLed(TrackingLed, 3, 150);
 
-//     // turnOffSupportLedTime = millis() + SupportLedOnTime;
-//     // Serial.print("Turning led off at ");
-//     // Serial.println(turnOffSupportLedTime);
+    // turnOffSupportLedTime = millis() + SupportLedOnTime;
+    // Serial.print("Turning led off at ");
+    // Serial.println(turnOffSupportLedTime);
 
-//     //rgbStrip.runAnimation();
-//     // Serial.println("Turning ON lights <>");
-//     // rgbLeds->setColor(0, 255, 255); // aqua
+    //rgbStrip.runAnimation();
+    // Serial.println("Turning ON lights <>");
+    // rgbLeds->setColor(0, 255, 255); // aqua
 
-//     obs.sleep(2000); 
+    obs.sleep(2000); 
 
-//     // rgbLeds->turnOff();
-//     // Serial.println("Turning OFF lights ><");
+    // rgbLeds->turnOff();
+    // Serial.println("Turning OFF lights ><");
 
     
-// //    cycleColors();
+//    cycleColors();
 
-//     //ToggleSupportLed(true);
-// }
+    //ToggleSupportLed(true);
+}
 
-// void ToggleSupportLed(bool onOrOff){
-//     digitalWrite(SupportLed, onOrOff);
-//     supportLedOn = onOrOff;
-// }
+void ToggleSupportLed(bool onOrOff){
+    digitalWrite(SupportLed, onOrOff);
+    supportLedOn = onOrOff;
+}
 
-// void cycleColors(void){
+void cycleColors(void){
     
-//     rgbLeds->setColor(255, 0, 0); // red
-//     obs.sleep(2000);
-//     rgbLeds->setColor(0, 255, 0); // green
-//     obs.sleep(2000);
-//     rgbLeds->setColor(0, 0, 255); // blue
-//     obs.sleep(2000);
-//     rgbLeds->setColor(255, 255, 0); // yellow
-//     obs.sleep(2000);
-//     rgbLeds->setColor(80, 0, 80); // purple
-//     obs.sleep(2000);
-//     rgbLeds->setColor(0, 255, 255); // aqua
-//     obs.sleep(2000);
-// }
+    rgbLeds->setColor(255, 0, 0); // red
+    obs.sleep(2000);
+    rgbLeds->setColor(0, 255, 0); // green
+    obs.sleep(2000);
+    rgbLeds->setColor(0, 0, 255); // blue
+    obs.sleep(2000);
+    rgbLeds->setColor(255, 255, 0); // yellow
+    obs.sleep(2000);
+    rgbLeds->setColor(80, 0, 80); // purple
+    obs.sleep(2000);
+    rgbLeds->setColor(0, 255, 255); // aqua
+    obs.sleep(2000);
+}

@@ -9,6 +9,7 @@ ObS::ObS(){
 //<<destructor>>
 ObS::~ObS(){/*nothing to destruct*/}
 
+
 //turn the ObS on
 void ObS::digiOn(int pin){
        digitalWrite(pin,HIGH); //set the pin HIGH and thus turn ObS on
@@ -88,6 +89,10 @@ void ObS::periodicOnLed_LoopLogic(void){
     lastTimeOnAwknowledged = millis();
 }
 
+
+
+
+//TODO: move to own class?
 bool ObS::OnOffButtonLoop(void){
     onOffButton->loop();
 

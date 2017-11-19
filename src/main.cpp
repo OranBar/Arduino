@@ -22,14 +22,6 @@
 
 #define SupportLedOnTime 5000 
 #define LoopRate 1000
-
-bool motionDetected = false;
-
-int motionTimesRecord[10];
-int motionTimeIndex = -1;
-
-int turnOffSupportLedTime = 0;
-bool supportLedOn = false;
    
 bool activateLeds = false;
 
@@ -47,7 +39,6 @@ AlaLedRgb rgbStrip;
 bool off;
 
 void OnMotionDetected(void);
-void ToggleSupportLed(bool on); 
 void cycleColors(void);
 AlaColor lerpColor(AlaColor min, AlaColor max, float t);
 int lerpInt(int min, int max, float t);
@@ -94,11 +85,6 @@ void OnMotionDetected(){
     // obs.sleep(2000); 
 
     // rgbLeds->turnOff();
-}
-
-void ToggleSupportLed(bool onOrOff){
-    digitalWrite(SupportLed, onOrOff);
-    supportLedOn = onOrOff;
 }
 
 void cycleColors(void){

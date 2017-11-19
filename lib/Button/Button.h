@@ -8,12 +8,13 @@ class Button {
         Button(int buttonPin);
         ~Button();
         void loop(void);
+        int getCurrentPressDuration(void);
         bool buttonWasPressed;
         bool buttonDown;
         bool buttonWasReleased;
-        int lastPressTime;
+        long lastPressTime;
         int lastPressDuration;
-        
+
     private:
         int pin;
 };

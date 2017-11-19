@@ -1,5 +1,5 @@
 #include <Arduino.h>
-
+#include "Ala.h"
 
 
 class RGBLeds {
@@ -15,3 +15,8 @@ class RGBLeds {
         int redPin, greenPin, bluePin;
         
 };
+
+// struct Color {
+//     public:
+//         int red, blue, green;
+// } White;

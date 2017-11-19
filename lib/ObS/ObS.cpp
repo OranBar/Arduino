@@ -1,8 +1,5 @@
 #include "ObS.h" //include the declaration for this class
 
-
-
-
 ObS::ObS(){
    pinMode(ObS_PIN, OUTPUT); //make that pin an OUTPUT
    off = rebooted = false;
@@ -76,26 +73,37 @@ void ObS::flashLed(int pin, int times, int delayMillis){
     }
 }
 
+bool ObS::loop(void){
+    bool abortLoopAfterThis = false;
+
+    //abortLoopAfterThis = OnOffButtonLoop();
+
+    periodicOnLed_LoopLogic();
+
+    return abortLoopAfterThis;
+}
+
+void ObS::periodicOnLed_LoopLogic(void){
+    flashLed(ObS_PIN, 2, 1000);
+    lastTimeOnAwknowledged = millis();
+}
+
 bool ObS::OnOffButtonLoop(void){
     onOffButton->loop();
-    if(onOffButton->buttonWasPressed){
-        if(off){
+
+    if(onOffButton->getCurrentPressDuration() > 3000){
+        if (off)        {
             Serial.println("ReBooting >>>>");
             bootAnim(ObS_PIN);
             sleep(500);
             off = false;
-            //lastButtonPressTime = millis();
             Serial.println("ReBooting <<<<");
             rebooted = true;
-        }
-    }
-
-    if(onOffButton->buttonWasReleased){
-        if(off == false && onOffButton->lastPressDuration > TurnOffTimeout){
-            if(rebooted){
+        } else {
+            if (rebooted) {
                 rebooted = false;
                 return true;
-                //Successfully burnt the onOffButton released that would have triggered a turn off
+                //Successfully burnt the ad onOffButton released that was have triggering a turn off
             }
             Serial.println("Turning Off >>>> ");
 
@@ -110,3 +118,62 @@ bool ObS::OnOffButtonLoop(void){
 
     return false;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// bool ObS::OnOffButtonLoop(void){
+//     onOffButton->loop();
+//     if(onOffButton->buttonWasPressed){
+//         if(off){
+//             Serial.println("ReBooting >>>>");
+//             bootAnim(ObS_PIN);
+//             sleep(500);
+//             off = false;
+//             //lastButtonPressTime = millis();
+//             Serial.println("ReBooting <<<<");
+//             rebooted = true;
+//         }
+//     }
+
+//     if(onOffButton->buttonWasReleased){
+//         if(off == false && onOffButton->lastPressDuration > TurnOffTimeout){
+//             if(rebooted){
+//                 rebooted = false;
+//                 return true;
+//                 //Successfully burnt the onOffButton released that would have triggered a turn off
+//             }
+//             Serial.println("Turning Off >>>> ");
+
+//             //Serial.print("Press time was");
+//             //Serial.println((millis() - lastonOffButtonPressTime));
+
+//             off = true;
+//             flashLed(ObS_PIN, 4, 200);
+//             Serial.println("Turning Off <<<<");
+//         }
+//     }
+
+//     return false;
+// }

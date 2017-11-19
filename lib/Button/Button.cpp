@@ -31,7 +31,6 @@ void Button::loop()
             #ifdef VerboseButton
                 Serial.println("Button Pressed <>");
             #endif
-
         }
     } else {
         if(buttonDown){
@@ -47,4 +46,11 @@ void Button::loop()
     }
 }
 
+int Button::getCurrentPressDuration(void){
+    if(buttonDown){
+        return millis() - lastPressTime;
+    } else {
+        return 0;
+    }
+}
 #endif

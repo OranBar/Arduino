@@ -9,7 +9,7 @@ class MotionSensor {
         ~MotionSensor();
         void loop(void);
         bool wasMotionDetected;
-        int lastMotionTimestamp;
+        long lastMotionTimestamp;
         
     private:
         int pin;

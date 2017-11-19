@@ -11,7 +11,7 @@
 //------------------
 
 #define TurnOffTimeout 3000 //3 secondi
-
+#define AwknowledgementRate 45000 //45 secondi
 
 #include <Arduino.h>
 #include <JeeLib.h>
@@ -28,12 +28,15 @@ public:
         void bootAnim(int ledpin);
         void flashLed(int pin, int times, int delayMillis);      
 
-        bool OnOffButtonLoop(void);        
+        bool OnOffButtonLoop(void);   
+        bool loop(void); 
 
 private:
         bool rebooted;  
         bool off;
         Button* onOffButton;
+        long lastTimeOnAwknowledged;
+        void periodicOnLed_LoopLogic(void);
 };
  
 #endif

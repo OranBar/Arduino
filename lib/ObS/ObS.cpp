@@ -2,8 +2,9 @@
 
 ObS::ObS(){
    pinMode(ObS_PIN, OUTPUT); //make that pin an OUTPUT
-   off = rebooted = false;
-   onOffButton = new Button(OnOffButton);
+   off = false;
+   rebooted = false;
+   //onOffButton = new Button(OnOffButton);
 }
 
 //<<destructor>>
@@ -29,15 +30,15 @@ void ObS::onAndOff(int pin, int timeMillis){
 }
 
 void ObS::sleep(int timeMillis){
-    // delay(timeMillis);
+    delay(timeMillis);
     // Serial.print("Sleeping for ");
     // Serial.println(timeMillis);
     
-#ifdef DebugMode
-    delay(timeMillis);
-#else
-    Sleepy::loseSomeTime(timeMillis);
-#endif
+// #ifdef DebugMode
+//     delay(timeMillis);
+// #else
+//     Sleepy::loseSomeTime(timeMillis);
+// #endif
 }
 
 void ObS::bootAnim(int ledpin){
@@ -67,9 +68,9 @@ void ObS::bootAnim(int ledpin){
 
 void ObS::flashLed(int pin, int times, int delayMillis){
     for(int i=0; i<times; i++){
-        if(i!=0) sleep(delayMillis);
+        if(i!=0) ObS::sleep(delayMillis);
         digitalWrite(pin, HIGH);
-        sleep(delayMillis);
+        ObS::sleep(delayMillis);
         digitalWrite(pin, LOW);
     }
 }
@@ -85,44 +86,51 @@ bool ObS::loop(void){
 }
 
 void ObS::periodicOnLed_LoopLogic(void){
-    flashLed(ObS_PIN, 2, 1000);
-    lastTimeOnAwknowledged = millis();
+    if(millis() - lastTimeOnAwknowledged > AwknowledgementRate){
+        Serial.println("Flashing ON lights <>");
+        // flashLed(ObS_PIN, 2, 500);
+        flashLed(ObS_PIN, 1, 1500);
+        sleep(500);
+        flashLed(ObS_PIN, 2, 500);
+        lastTimeOnAwknowledged = millis();
+        Serial.println("Flashing ON lights ><");
+    }
 }
 
 
 
 
 //TODO: move to own class?
-bool ObS::OnOffButtonLoop(void){
-    onOffButton->loop();
+// bool ObS::OnOffButtonLoop(void){
+    // onOffButton->loop();
 
-    if(onOffButton->getCurrentPressDuration() > 3000){
-        if (off)        {
-            Serial.println("ReBooting >>>>");
-            bootAnim(ObS_PIN);
-            sleep(500);
-            off = false;
-            Serial.println("ReBooting <<<<");
-            rebooted = true;
-        } else {
-            if (rebooted) {
-                rebooted = false;
-                return true;
-                //Successfully burnt the ad onOffButton released that was have triggering a turn off
-            }
-            Serial.println("Turning Off >>>> ");
+    // if(onOffButton->getCurrentPressDuration() > 1750){
+    //     if (off)        {
+    //         Serial.println("ReBooting >>>>");
+    //         bootAnim(ObS_PIN);
+    //         sleep(500);
+    //         off = false;
+    //         Serial.println("ReBooting <<<<");
+    //         rebooted = true;
+    //     } else {
+    //         if (rebooted) {
+    //             rebooted = false;
+    //             return true;
+    //             //Successfully burnt the ad onOffButton released that was have triggering a turn off
+    //         }
+    //         Serial.println("Turning Off >>>> ");
 
-            //Serial.print("Press time was");
-            //Serial.println((millis() - lastonOffButtonPressTime));
+    //         //Serial.print("Press time was");
+    //         //Serial.println((millis() - lastonOffButtonPressTime));
 
-            off = true;
-            flashLed(ObS_PIN, 4, 200);
-            Serial.println("Turning Off <<<<");
-        }
-    }
+    //         off = true;
+    //         flashLed(ObS_PIN, 4, 200);
+    //         Serial.println("Turning Off <<<<");
+    //     }
+    // }
 
-    return false;
-}
+//     return false;
+// }
 
 
 

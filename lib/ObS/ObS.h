@@ -14,27 +14,27 @@
 #define AwknowledgementRate 45000 //45 secondi
 
 #include <Arduino.h>
-#include <JeeLib.h>
-#include "Button.h"
+
+
 
 class ObS {
 public:
         ObS();
         ~ObS();
-        void digiOn(int pin);
-        void digiOff(int pin);
-        void onAndOff(int pin, int timeMillis);
-        void sleep(int timeMillis);
+        static void digiOn(int pin);
+        static void digiOff(int pin);
+        static void onAndOff(int pin, int timeMillis);
+        static void sleep(int timeMillis);
         void bootAnim(int ledpin);
-        void flashLed(int pin, int times, int delayMillis);      
+        static void flashLed(int pin, int times, int delayMillis);      
 
-        bool OnOffButtonLoop(void);   
+        // bool OnOffButtonLoop(void);   
         bool loop(void); 
 
 private:
         bool rebooted;  
         bool off;
-        Button* onOffButton;
+        // Button* onOffButton;
         long lastTimeOnAwknowledged;
         void periodicOnLed_LoopLogic(void);
 };

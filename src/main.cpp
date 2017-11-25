@@ -1,127 +1,167 @@
 #include <ObS.h>
 #include <MotionSensor.h>
 #include <RGBLeds.h>
-#include "AlaLedRgb.h"
+#include "AlaLed.h"
 #include "Ala.h"
+#include <PcIManager.h>
+#include <Button.h>
+#include <SoftTimer.h>
 
 #define Unused 7
 
 //Pins
-#define Red 8
-#define Green 9
-#define Blue 10
+#define Red 4 //8
+#define Green 5
+#define Blue 6
 #define TrackingLed 13
-#define MotionSensonPin 4
+#define MotionSensonPin 3
 #define SupportLed Unused
-#define ButtonPin 6
-#define R_Pin 10
-#define G_Pin 11
-#define B_Pin 12
-#define SignalLed 13
+#define ButtonPin 2
 //---
-
+#define LedSleepDuration 25
 #define SupportLedOnTime 5000 
-#define LoopRate 1000
+#define LoopRate 25
    
 bool activateLeds = false;
 
 ObS obs;//initialize an instance of the OranBar Operating System ObS class, the powerful engine that drives it all.
 MotionSensor* motionSensor;
 RGBLeds* rgbLeds;
-Button* button;
 
-AlaLedRgb rgbStrip;
+AlaLed rgbStrip;
+SimpleTimer timer;
 
-#ifdef DebugMode
-    ISR(WDT_vect) { Sleepy::watchdogEvent(); } // Setup the watchdog
-#endif
-
-bool off;
-
-void OnMotionDetected(void);
+void SignalAndActivateLeds(void);
 void cycleColors(void);
+void lerpToColor(AlaColor end, int totDuration);
+void lerpToColorStep(void);
+void stopLerp(int pressDuration);
+
 AlaColor lerpColor(AlaColor min, AlaColor max, float t);
 int lerpInt(int min, int max, float t);
 float lerpFloat(float min, float max, float t);
 
-void setup(){
-    Serial.begin(9600);
-
-    motionSensor = new MotionSensor(MotionSensonPin, OnMotionDetected);
-    // rgbLeds = new RGBLeds(Red, Green, Blue);
-    button = new Button(ButtonPin);
-    obs.bootAnim(SignalLed);
-    
-    // rgbLeds->turnOff();
-
-    //Init led strip
-    byte pins[] = {Red, Green, Blue};
-    rgbStrip.initPWM(3, pins);
-    rgbStrip.setAnimation(ALA_FADECOLORSLOOP, 12000, alaPalRgb);
+//Button Setup
+Button* button;
+void pin3Interrupt(){
+    button->onButtonRising();
+    obs.flashLed(ObS_PIN, 1, 500); 
 }
 
+void setup(){
+    attachInterrupt(1, pin3Interrupt, RISING); 
+    button = new Button(ButtonPin, stopLerp);   
+//Button Setup complete 
+
+    Serial.begin(9600);
+    motionSensor = new MotionSensor(MotionSensonPin, SignalAndActivateLeds);
+    rgbLeds = new RGBLeds(Red, Green, Blue);
+
+    obs.bootAnim(ObS_PIN);
+}
 
 void loop() {
+    timer.run();
     obs.loop();
     motionSensor->loop();
-    // rgbLeds->loop();
+    rgbLeds->loop();    //does nothing
+    
+    if(rgbLeds->ledsOn){
+        obs.sleep((LedSleepDuration-1)/2);
+    } else {
+        obs.sleep(LoopRate);
+    }
+}
 
-    if(activateLeds){
-        rgbStrip.runAnimation();
-        if(millis() - motionSensor->lastMotionTimestamp > 12000 + 100){
-            activateLeds = false;
-        }
+void SignalAndActivateLeds(){
+    obs.flashLed(TrackingLed, 3, 150);
+    cycleColors();
+}
+
+//Lerp to Color functions ---------------------------------
+AlaColor endColor;
+float currLerpDuration;
+float t;
+int lerpTimerId;
+#define NoOfColors 8
+AlaColor colors[NoOfColors];
+int lerpDurations[NoOfColors];
+int index;
+
+void cycleColors(){
+    AlaColor tmpC[] = {
+        AlaColor(255, 0, 0),
+        AlaColor(0, 255, 0),
+        AlaColor(0, 0, 255),
+        AlaColor(0, 255, 255), 
+        AlaColor(255, 255, 255),
+        AlaColor(255, 0, 255), 
+        AlaColor(255, 0, 0), 
+        AlaColor(0, 0, 0)
+    };
+    int i = NoOfColors;
+    while(--i){
+        colors[i] = tmpC[i];
     }
 
-    obs.sleep(LoopRate - activateLeds * 950);
+    int tmpI[] ={
+        3000,
+        3000,
+        3000,
+        3000,
+        6000,
+        3000,
+        3000
+    };
+    i = NoOfColors;
+    while(--i){
+        lerpDurations[i] = tmpI[i];
+    }
+    // *lerpDurations = *tmpI;
+
+    index = 0;
+
+    lerpToColor(colors[0], lerpDurations[0]);
 }
 
-void OnMotionDetected(){
-    obs.flashLed(TrackingLed, 3, 150);
+void lerpToColor(AlaColor end, int totDuration){
+    t = 0;
+    endColor = end;
+    currLerpDuration = totDuration;
+    lerpToColorStep();
 
-    activateLeds = true;
-    // cycleColors();
+}
+
+void lerpToColorStep(){
+    if(t >= 1 ){
+        if(index+1 < NoOfColors){
+            index++;
+            obs.flashLed(ObS_PIN, 2, 150); 
+            lerpToColor(colors[index], lerpDurations[index]);
+            Serial.print("Next color: ");
+            Serial.print(colors[index].r);
+            Serial.print(" ");
+            Serial.print(colors[index].g);
+            Serial.print(" ");
+            Serial.print(colors[index].b);
+            Serial.println("");
+
+            Serial.print("Next duration: ");
+            Serial.print(lerpDurations[index]);
+        } 
+        return;
+    }
+
+    AlaColor newColor = rgbLeds->color.interpolate(colors[index], t);
+    rgbLeds->setColor(newColor);
+
+    t += LedSleepDuration / currLerpDuration; 
     
-    // obs.sleep(2000); 
-
-    // rgbLeds->turnOff();
+    lerpTimerId = timer.setTimeout(LedSleepDuration, lerpToColorStep);
 }
 
-void cycleColors(void){
-    // float t;
-    // AlaColor min, max;
-    // while(t >= 0){
-    //     AlaColor color = lerpColor(min, max, t);
-    //     // rgbLeds->setColor();
-
-    //     t++; //CHANGEME
-    // }
-
-    rgbLeds->setColor(255, 0, 0); // red
-    obs.sleep(2000);
-    rgbLeds->setColor(0, 255, 0); // green
-    obs.sleep(2000);
-    rgbLeds->setColor(0, 0, 255); // blue
-    obs.sleep(2000);
-    rgbLeds->setColor(255, 255, 0); // yellow
-    obs.sleep(2000);
-    rgbLeds->setColor(80, 0, 80); // purple
-    obs.sleep(2000);
-    rgbLeds->setColor(0, 255, 255); // aqua
-    obs.sleep(2000);
+void stopLerp(int pressDuration){
+    timer.deleteTimer(lerpTimerId);
+    rgbLeds->turnOff();
 }
-
-
-///----------------------
-AlaColor lerpColor(AlaColor min, AlaColor max, float t){
-    AlaColor result = min.interpolate(max, t);
-    return result;
-}
-
-int lerpInt(int min, int max, float t){
-    return (1 - t) * min + t * max;
-}
-
-float lerpFloat(float min, float max, float t){
-    return (1 - t) * min + t * max;
-}
+//-------------------------------

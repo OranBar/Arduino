@@ -1,22 +1,18 @@
 #pragma once
 
 #include <Arduino.h>
-
+#include "Obs.h"
 
 #define VerboseButton
 
 class Button {
     public:
-        Button(int buttonPin);
+        Button(int buttonPin, void (*onButtonClickFunc)(int pressDuration));
         ~Button();
-        void loop(void);
-        int getCurrentPressDuration(void);
-        bool buttonWasPressed;
-        bool buttonDown;
-        bool buttonWasReleased;
-        long lastPressTime;
-        int lastPressDuration;
+        void onButtonRising(void);
 
     private:
         int pin;
+        unsigned long lastPressTime;
+        void (*onButtonClick)(int);
 };

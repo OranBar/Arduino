@@ -2,7 +2,9 @@
 
 #include <Arduino.h>
 #include "Ala.h"
-
+#include <SoftTimer.h>
+#include <DelayRun.h>
+#include <SimpleTimer.h>
 
 class RGBLeds {
     public:
@@ -10,12 +12,20 @@ class RGBLeds {
         ~RGBLeds();
         void loop(void);
         void setColor(int redValue, int greenValue, int blueValue);
+        void setColor(AlaColor color);
+        void lerpToColor(AlaColor end, int totDuration);
+
         void turnOff(void);
-        int red, green, blue;
-        
+        AlaColor color;
+        SimpleTimer timer;
+        bool ledsOn;
+
     private:
         int redPin, greenPin, bluePin;
+        bool stopLerping;
+        AlaColor lerpColor(AlaColor min, AlaColor max, float t);
         
+        void lerpToColorStep();
 };
 
 // struct Color {

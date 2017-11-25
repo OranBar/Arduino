@@ -2,6 +2,8 @@
 
 //#define COMMOD_ANODE
 
+
+
 RGBLeds::RGBLeds(int redOutputPin, int greenOutputPin, int blueOutputPin){
     redPin = redOutputPin;
     pinMode(redPin, OUTPUT);
@@ -11,6 +13,8 @@ RGBLeds::RGBLeds(int redOutputPin, int greenOutputPin, int blueOutputPin){
 
     bluePin = blueOutputPin;
     pinMode(bluePin, OUTPUT);
+
+    turnOff();
 }
 
 RGBLeds::~RGBLeds(){/*Nothing to do here*/}
@@ -20,24 +24,26 @@ void RGBLeds::loop(void){
 }
 
 void RGBLeds::setColor(int redValue, int greenValue, int blueValue){
-// #ifdef COMMON_ANODE
-//     red = 255 - red;
-//     green = 255 - green;
-//     blue = 255 - blue;
-// #else
-    red = redValue;
-    green = greenValue;
-    blue = blueValue;
-// #endif
+    color = AlaColor(redValue, greenValue, blueValue);
+    setColor(color);
+}
 
-    analogWrite(redPin, red);
-    analogWrite(greenPin, green);
-    analogWrite(bluePin, blue);
+void RGBLeds::setColor(AlaColor colorToSet){
+    analogWrite(redPin, colorToSet.r);
+    analogWrite(greenPin, colorToSet.g);
+    analogWrite(bluePin, colorToSet.b);
+    
+    color = colorToSet;
+    if(color.r + color.b + color.g == 0){
+        ledsOn = false;
+    } else {
+        ledsOn = true;
+    }
 }
 
 void RGBLeds::turnOff(){
+    stopLerping = true;
     setColor(0,0,0);
-    // Color color;
-    AlaColor color = new AlaColor(0,0,0);
-    
 }
+
+//---------------

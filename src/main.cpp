@@ -20,7 +20,7 @@
 //---
 #define LedSleepDuration 25
 #define SupportLedOnTime 5000 
-#define LoopRate 25
+#define LoopRate 1000
    
 bool activateLeds = false;
 
@@ -100,7 +100,7 @@ void cycleColors(){
         AlaColor(0, 0, 0)
     };
     int i = NoOfColors;
-    while(--i){
+    while(i--){
         colors[i] = tmpC[i];
     }
 
@@ -114,10 +114,9 @@ void cycleColors(){
         3000
     };
     i = NoOfColors;
-    while(--i){
+    while(i--){
         lerpDurations[i] = tmpI[i];
     }
-    // *lerpDurations = *tmpI;
 
     index = 0;
 
@@ -136,18 +135,7 @@ void lerpToColorStep(){
     if(t >= 1 ){
         if(index+1 < NoOfColors){
             index++;
-            obs.flashLed(ObS_PIN, 2, 150); 
             lerpToColor(colors[index], lerpDurations[index]);
-            Serial.print("Next color: ");
-            Serial.print(colors[index].r);
-            Serial.print(" ");
-            Serial.print(colors[index].g);
-            Serial.print(" ");
-            Serial.print(colors[index].b);
-            Serial.println("");
-
-            Serial.print("Next duration: ");
-            Serial.print(lerpDurations[index]);
         } 
         return;
     }

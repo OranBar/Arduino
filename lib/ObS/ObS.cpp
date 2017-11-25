@@ -4,7 +4,6 @@ ObS::ObS(){
    pinMode(ObS_PIN, OUTPUT); //make that pin an OUTPUT
    off = false;
    rebooted = false;
-   //onOffButton = new Button(OnOffButton);
 }
 
 //<<destructor>>
@@ -31,14 +30,6 @@ void ObS::onAndOff(int pin, int timeMillis){
 
 void ObS::sleep(int timeMillis){
     delay(timeMillis);
-    // Serial.print("Sleeping for ");
-    // Serial.println(timeMillis);
-    
-// #ifdef DebugMode
-//     delay(timeMillis);
-// #else
-//     Sleepy::loseSomeTime(timeMillis);
-// #endif
 }
 
 void ObS::bootAnim(int ledpin){
@@ -62,7 +53,7 @@ void ObS::bootAnim(int ledpin){
 #endif
 
     //Wait a sec, for good measure
-    sleep(100);
+    sleep(1000);
 
 }
 
@@ -88,10 +79,7 @@ bool ObS::loop(void){
 void ObS::periodicOnLed_LoopLogic(void){
     if(millis() - lastTimeOnAwknowledged > AwknowledgementRate){
         Serial.println("Flashing ON lights <>");
-        // flashLed(ObS_PIN, 2, 500);
-        flashLed(ObS_PIN, 1, 1500);
-        sleep(500);
-        flashLed(ObS_PIN, 2, 500);
+        flashLed(ObS_PIN, 1, 3000);
         lastTimeOnAwknowledged = millis();
         Serial.println("Flashing ON lights ><");
     }

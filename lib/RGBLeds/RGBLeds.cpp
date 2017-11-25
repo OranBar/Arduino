@@ -2,8 +2,6 @@
 
 //#define COMMOD_ANODE
 
-
-
 RGBLeds::RGBLeds(int redOutputPin, int greenOutputPin, int blueOutputPin){
     redPin = redOutputPin;
     pinMode(redPin, OUTPUT);
@@ -42,8 +40,6 @@ void RGBLeds::setColor(AlaColor colorToSet){
 }
 
 void RGBLeds::turnOff(){
-    stopLerping = true;
     setColor(0,0,0);
 }
 
-//---------------

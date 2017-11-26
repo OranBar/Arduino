@@ -9,6 +9,7 @@ Button::Button(int buttonPin, void (*onButtonClickFunc)(int pressDuration)){
     pin = buttonPin;
     pinMode(pin, OUTPUT); //make that pin an OUTPUT?
     onButtonClick = onButtonClickFunc;
+    buttonPressed = false;
 }
 
 //<<destructor>>
@@ -22,7 +23,10 @@ void Button::onButtonRising()
         #endif
 
         lastPressTime = millis();
+        buttonPressed = true;
     }else{
+        if(buttonPressed == false){ return; } 
+
         unsigned long lastPressDuration = millis() - lastPressTime;
         (*onButtonClick)(lastPressDuration);
 
@@ -31,5 +35,6 @@ void Button::onButtonRising()
             Serial.print("press duration was");
             Serial.println(lastPressDuration);
         #endif
+        buttonPressed = false;
     }
 }

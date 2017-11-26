@@ -14,5 +14,6 @@ class Button {
     private:
         int pin;
         unsigned long lastPressTime;
+        bool buttonPressed;
         void (*onButtonClick)(int);
 };

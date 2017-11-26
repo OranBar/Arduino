@@ -6,6 +6,7 @@
 #include <PcIManager.h>
 #include <Button.h>
 #include <SoftTimer.h>
+#include <SimpleTimer.h>
 
 #define Unused 7
 
@@ -22,7 +23,7 @@
 #define SupportLedOnTime 5000 
 #define LoopRate 1000
    
-bool activateLeds = false;
+bool cyclingColors = false;
 
 ObS obs;//initialize an instance of the OranBar Operating System ObS class, the powerful engine that drives it all.
 MotionSensor* motionSensor;
@@ -75,7 +76,10 @@ void loop() {
 
 void SignalAndActivateLeds(){
     obs.flashLed(TrackingLed, 3, 150);
-    cycleColors();
+    if(rgbLeds->ledsOn == false){
+        Serial.println("cycling leds");
+        cycleColors();
+    }
 }
 
 //Lerp to Color functions ---------------------------------
@@ -120,6 +124,7 @@ void cycleColors(){
 
     index = 0;
 
+    cyclingColors = true;
     lerpToColor(colors[0], lerpDurations[0]);
 }
 
@@ -128,7 +133,6 @@ void lerpToColor(AlaColor end, int totDuration){
     endColor = end;
     currLerpDuration = totDuration;
     lerpToColorStep();
-
 }
 
 void lerpToColorStep(){
@@ -136,7 +140,13 @@ void lerpToColorStep(){
         if(index+1 < NoOfColors){
             index++;
             lerpToColor(colors[index], lerpDurations[index]);
+            // Serial.print("going to next color, index is ");
+            // Serial.println(index);
         } 
+        // else {
+        //     // cyclingColors = false;
+        //     // Serial.println("cyclindg colors off");
+        // }
         return;
     }
 
@@ -149,7 +159,9 @@ void lerpToColorStep(){
 }
 
 void stopLerp(int pressDuration){
+    cyclingColors = false;
     timer.deleteTimer(lerpTimerId);
     rgbLeds->turnOff();
 }
 //-------------------------------
+

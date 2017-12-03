@@ -8,19 +8,17 @@
 #include <SoftTimer.h>
 #include <SimpleTimer.h>
 
-#define Unused 7
+#define Unused 0
 
 //Pins
-#define Red 4 //8
-#define Green 5
-#define Blue 6
+#define Red 8 //8
+#define Green 9
+#define Blue 10
 #define TrackingLed 13
 #define MotionSensonPin 3
-#define SupportLed Unused
 #define ButtonPin 2
 //---
 #define LedSleepDuration 25
-#define SupportLedOnTime 5000 
 #define LoopRate 1000
    
 bool cyclingColors = false;
@@ -61,15 +59,30 @@ void setup(){
     obs.bootAnim(ObS_PIN);
 }
 
+int tmp1, tmp2;
+
 void loop() {
     timer.run();
     obs.loop();
     motionSensor->loop();
     rgbLeds->loop();    //does nothing
     
-    if(rgbLeds->ledsOn){
-        obs.sleep((LedSleepDuration-1)/2);
+    // if(rgbLeds->ledsOn){
+    if(cyclingColors){
+        tmp1 = (tmp1+1)%3;
+        int i = tmp1;
+        while(i--){
+            Serial.print(".");
+        }
+        Serial.println("");
+        obs.sleep((LedSleepDuration-1)/3);
     } else {
+        tmp2 = (tmp2+1)%3;
+        int i = tmp1;
+        while(i--){
+            Serial.print("x");
+        }
+        Serial.println("");
         obs.sleep(LoopRate);
     }
 }
@@ -79,6 +92,8 @@ void SignalAndActivateLeds(){
     if(rgbLeds->ledsOn == false){
         Serial.println("cycling leds");
         cycleColors();
+    } else {
+        Serial.println("leds already on");
     }
 }
 
@@ -96,12 +111,12 @@ void cycleColors(){
     AlaColor tmpC[] = {
         AlaColor(255, 0, 0),
         AlaColor(0, 255, 0),
-        AlaColor(0, 0, 255),
+        AlaColor(0, 0, 255), //3
         AlaColor(0, 255, 255), 
         AlaColor(255, 255, 255),
-        AlaColor(255, 0, 255), 
+        AlaColor(255, 0, 255), //6
         AlaColor(255, 0, 0), 
-        AlaColor(0, 0, 0)
+        AlaColor(0, 0, 0) //8
     };
     int i = NoOfColors;
     while(i--){
@@ -111,11 +126,12 @@ void cycleColors(){
     int tmpI[] ={
         3000,
         3000,
-        3000,
+        3000,//3
         3000,
         6000,
+        3000,//6
         3000,
-        3000
+        3000//8
     };
     i = NoOfColors;
     while(i--){
@@ -136,17 +152,17 @@ void lerpToColor(AlaColor end, int totDuration){
 }
 
 void lerpToColorStep(){
+    //base case
     if(t >= 1 ){
+        //if not last, go to next
         if(index+1 < NoOfColors){
             index++;
             lerpToColor(colors[index], lerpDurations[index]);
-            // Serial.print("going to next color, index is ");
-            // Serial.println(index);
-        } 
-        // else {
-        //     // cyclingColors = false;
-        //     // Serial.println("cyclindg colors off");
-        // }
+            Serial.print("going to next color, index is ");
+            Serial.println(index);
+        } else {
+            cyclingColors = false;
+        }
         return;
     }
 

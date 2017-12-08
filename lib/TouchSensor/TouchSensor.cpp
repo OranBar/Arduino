@@ -1,13 +1,14 @@
 #include "TouchSensor.h"
 
-TouchSensor::TouchSensor(int touchSensorPin)
+TouchSensor::TouchSensor(int touchSensorPin){
     pin = touchSensorPin;
-    pinMode(pin, OUTPUT); //make that pin an OUTPUT?
+    pinMode(pin, INPUT); //make that pin an OUTPUT?
 
     int i = PressTimesHistory_Cardinality;
     while(i--){
         lastPressBeginTimestamp[i] = NULL;
     }
+    isPressed = false;
 }
 
 //<<destructor>>
@@ -19,54 +20,62 @@ void TouchSensor::loop(void)
     doubleTouchDetected = false;
     longTouchDetected = false;
 
-    if(digitalRead(pin)){
-        #ifdef VerboseTouchSensor
-            Serial.println("TouchSensor Pressed <>");
-        #endif
+    //Single press logic: Wait to make sure it's not a double press, then set single press to true.
+    if(waitingForDoublePress){
+        if(millis() - lastPressBeginTimestamp[0] >= DoublePress_SecondTouchMaxDelay){
+            singleTouchDetected = true;
+            logln("[TouchSensor] Single Click");
+            waitingForDoublePress = false;
+        }
+    }
+
+    if(digitalRead(pin) == HIGH && isPressed == false){
+        logln("[TouchSensor] Pressed <>");
         
         updateLastPressTimesArray(millis());
-    }else{
-        //If never pressed, let's avoid setting the lastPressDuration to some bullshit amount, and early out
-        if(lastPressBeginTimestamp[0] != NULL){ 
-            return;
-        }
-
+        isPressed = true;
+    }else if(digitalRead(pin) == LOW && isPressed){
         unsigned long lastPressDuration = millis() - lastPressBeginTimestamp[0];
-
-        if(millis() - lastPressBeginTimestamp[1] <= DoublePress_SecondTouchMaxDelay){
-            //Double press logic
-            doubleTouchDetected = true;
-            #ifdef VerboseTouchSensor
-                Serial.println("TouchSensor Double Click");
-            #endif
-        } else {
-            //Single press logic
-            singleTouchDetected = true;
-            #ifdef VerboseTouchSensor
-                Serial.println("TouchSensor Single Click");
-            #endif
-        }
 
         //Long button press logic
         if(lastPressDuration >= LongPress_MinPressTime){
             longTouchDetected = true;
-             #ifdef VerboseTouchSensor
-                Serial.println("TouchSensor Long Press");
-            #endif
+            logln("[TouchSensor] Long Press");
+        } else {
+            if(waitingForDoublePress){
+                doubleTouchDetected = true;
+                logln("[TouchSensor] Double Click");
+                waitingForDoublePress = false;
+            } else {
+                waitingForDoublePress = true;
+            }
         }
+        isPressed = false;
 
-        #ifdef VerboseTouchSensor
-            Serial.println("TouchSensor Released ><");
-            Serial.print("press duration was");
-            Serial.println(lastPressDuration);
-        #endif
+        log("[TouchSensor] Released ><  - ");
+    #ifdef VerboseTouchSensor
+        Serial.println(lastPressDuration);
+    #endif
     }
 }
 
 void TouchSensor::updateLastPressTimesArray(unsigned long beginPressTimeStamp){
     int i = PressTimesHistory_Cardinality - 1;
-    while(i-- >=1){
-        lastPressBeginTimestamp[i] = lastPressBeginTimestamp[i+1];
+    while(i >= 1){
+        lastPressBeginTimestamp[i] = lastPressBeginTimestamp[i-1];
+        i--;
     }
     lastPressBeginTimestamp[0] = beginPressTimeStamp;
+}
+
+void TouchSensor::log(const char* msg){
+    #ifdef VerboseTouchSensor
+        Serial.print(msg);
+    #endif
+}
+
+void TouchSensor::logln(const char* msg){
+    #ifdef VerboseTouchSensor
+        Serial.println(msg);
+    #endif
 }

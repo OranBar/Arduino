@@ -6,7 +6,7 @@
             "request": "launch",
             "cwd": "${workspaceRoot}",
             "name": "PlatformIO Debugger",
-            "target": "c:/Users/King Pub/Documents/Arduino-VSCode_PlatformIO/Projects/MotionSensor/.pioenvs/uno/firmware.elf",
+            "target": "c:/Users/King Pub/Documents/Arduino-VSCode_PlatformIO/Projects/Arduino_MainProject/.pioenvs/uno/firmware.elf",
             "gdbpath": "C:/Users/King Pub/.platformio/penv/Scripts/piodebuggdb",
             "autorun": [ "source .pioinit" ]
         }

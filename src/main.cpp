@@ -69,20 +69,20 @@ void loop() {
     
     // if(rgbLeds->ledsOn){
     if(cyclingColors){
-        tmp1 = (tmp1+1)%3;
-        int i = tmp1;
-        while(i--){
-            Serial.print(".");
-        }
-        Serial.println("");
+        // tmp1 = (tmp1+1)%3;
+        // int i = tmp1;
+        // while(i--){
+        //     Serial.print(".");
+        // }
+        // Serial.println("");
         obs.sleep((LedSleepDuration-1)/3);
     } else {
-        tmp2 = (tmp2+1)%3;
-        int i = tmp1;
-        while(i--){
-            Serial.print("x");
-        }
-        Serial.println("");
+        // tmp2 = (tmp2+1)%3;
+        // int i = tmp2;
+        // while(i--){
+        //     Serial.print("x");
+        // }
+        // Serial.println("");
         obs.sleep(LoopRate);
     }
 }

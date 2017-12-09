@@ -7,6 +7,7 @@
 #include <Button.h>
 #include <SoftTimer.h>
 #include <SimpleTimer.h>
+#include <TouchSensor.h>
 
 #define Unused 0
 
@@ -14,12 +15,14 @@
 #define Red 8 //8
 #define Green 9
 #define Blue 10
+#define TouchSensorPin 7
+#define TouchLed 13
 #define TrackingLed 13
 #define MotionSensonPin 3
 #define ButtonPin 2
 //---
 #define LedSleepDuration 25
-#define LoopRate 1000
+#define LoopRate 400
    
 bool cyclingColors = false;
 
@@ -31,6 +34,7 @@ AlaLed rgbStrip;
 SimpleTimer timer;
 
 void SignalAndActivateLeds(void);
+void reactivateMotionSensor();
 void cycleColors(void);
 void lerpToColor(AlaColor end, int totDuration);
 void lerpToColorStep(void);
@@ -39,6 +43,10 @@ void stopLerp(int pressDuration);
 AlaColor lerpColor(AlaColor min, AlaColor max, float t);
 int lerpInt(int min, int max, float t);
 float lerpFloat(float min, float max, float t);
+
+TouchSensor* touchSensor;
+
+bool deactivated = false;
 
 //Button Setup
 Button* button;
@@ -51,6 +59,7 @@ void setup(){
     attachInterrupt(1, pin3Interrupt, RISING); 
     button = new Button(ButtonPin, stopLerp);   
 //Button Setup complete 
+    touchSensor = new TouchSensor(TouchSensorPin);
 
     Serial.begin(9600);
     motionSensor = new MotionSensor(MotionSensonPin, SignalAndActivateLeds);
@@ -64,27 +73,52 @@ int tmp1, tmp2;
 void loop() {
     timer.run();
     obs.loop();
-    motionSensor->loop();
     rgbLeds->loop();    //does nothing
-    
+    touchSensor->loop();
+
+    if(deactivated == false){
+        motionSensor->loop();
+    }
+
+    if(touchSensor->singleTouchDetected){
+        SignalAndActivateLeds();
+    }    
+    if(touchSensor->doubleTouchDetected){
+        stopLerp(0);
+    }   
+    if(touchSensor->longTouchDetected){
+        deactivated = !deactivated;
+        if(deactivated){
+            stopLerp(0);
+            obs.onAndOff(TouchLed, 2000);
+            obs.onAndOff(TouchLed, 1000);
+            obs.onAndOff(TouchLed, 500);
+            obs.onAndOff(TouchLed, 250);
+            obs.onAndOff(TouchLed, 125);
+            obs.onAndOff(TouchLed, 77);
+
+            int _30_minutes = 180000;
+            int reactivateMotionSensor_timerId = timer.setTimeout(_30_minutes, reactivateMotionSensor);
+        } else {
+            obs.onAndOff(TouchLed, 77);
+            obs.onAndOff(TouchLed, 125);
+            obs.onAndOff(TouchLed, 250);
+            obs.onAndOff(TouchLed, 500);
+            obs.onAndOff(TouchLed, 1000);
+            obs.onAndOff(TouchLed, 2000);
+        }
+    }   
+
     // if(rgbLeds->ledsOn){
     if(cyclingColors){
-        // tmp1 = (tmp1+1)%3;
-        // int i = tmp1;
-        // while(i--){
-        //     Serial.print(".");
-        // }
-        // Serial.println("");
         obs.sleep((LedSleepDuration-1)/3);
     } else {
-        // tmp2 = (tmp2+1)%3;
-        // int i = tmp2;
-        // while(i--){
-        //     Serial.print("x");
-        // }
-        // Serial.println("");
         obs.sleep(LoopRate);
     }
+}
+
+void reactivateMotionSensor(){
+    deactivated = false;
 }
 
 void SignalAndActivateLeds(){

@@ -19,11 +19,11 @@
 #define TouchLed 13
 #define TrackingLed 13
 #define MotionSensonPin 3
-#define ButtonPin 2
+// #define ButtonPin 2
 //---
 #define LedSleepDuration 25
-#define LoopRate 400
-   
+#define LoopRate 300
+    
 bool cyclingColors = false;
 
 ObS obs;//initialize an instance of the OranBar Operating System ObS class, the powerful engine that drives it all.
@@ -48,17 +48,17 @@ TouchSensor* touchSensor;
 
 bool deactivated = false;
 
-//Button Setup
-Button* button;
-void pin3Interrupt(){
-    button->onButtonRising();
-    obs.flashLed(ObS_PIN, 1, 500); 
-}
+// //Button Setup
+// Button* button;
+// void pin3Interrupt(){
+//     button->onButtonRising();
+//     obs.flashLed(ObS_PIN, 1, 500); 
+// }
 
 void setup(){
-    attachInterrupt(1, pin3Interrupt, RISING); 
-    button = new Button(ButtonPin, stopLerp);   
-//Button Setup complete 
+//     attachInterrupt(1, pin3Interrupt, RISING); 
+//     button = new Button(ButtonPin, stopLerp);   
+// //Button Setup complete 
     touchSensor = new TouchSensor(TouchSensorPin);
 
     Serial.begin(9600);

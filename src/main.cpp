@@ -81,10 +81,10 @@ void loop() {
     }
 
     if(touchSensor->singleTouchDetected){
-        SignalAndActivateLeds();
+        stopLerp(0);
     }    
     if(touchSensor->doubleTouchDetected){
-        stopLerp(0);
+        SignalAndActivateLeds();
     }   
     if(touchSensor->longTouchDetected){
         deactivated = !deactivated;

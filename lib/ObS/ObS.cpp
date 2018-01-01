@@ -79,7 +79,7 @@ bool ObS::loop(void){
 void ObS::periodicOnLed_LoopLogic(void){
     if(millis() - lastTimeOnAwknowledged > AwknowledgementRate){
         Serial.println("Flashing ON lights <>");
-        flashLed(ObS_PIN, 1, 3000);
+        flashLed(ObS_PIN, 1, 50);
         lastTimeOnAwknowledged = millis();
         Serial.println("Flashing ON lights ><");
     }

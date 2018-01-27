@@ -48,17 +48,7 @@ TouchSensor* touchSensor;
 
 bool deactivated = false;
 
-// //Button Setup
-// Button* button;
-// void pin3Interrupt(){
-//     button->onButtonRising();
-//     obs.flashLed(ObS_PIN, 1, 500); 
-// }
-
 void setup(){
-//     attachInterrupt(1, pin3Interrupt, RISING); 
-//     button = new Button(ButtonPin, stopLerp);   
-// //Button Setup complete 
     touchSensor = new TouchSensor(TouchSensorPin);
 
     Serial.begin(9600);
@@ -69,10 +59,11 @@ void setup(){
 }
 
 int tmp1, tmp2;
+int reactivateMotionSensor_timerId = -1;
 
 void loop() {
     timer.run();
-    obs.loop();
+    obs.loop(); //does nothing
     rgbLeds->loop();    //does nothing
     touchSensor->loop();
 
@@ -89,23 +80,25 @@ void loop() {
     if(touchSensor->longTouchDetected){
         deactivated = !deactivated;
         if(deactivated){
+            //-----------
+            obs.onAndOff(TouchLed, 2000);
+            obs.onAndOff(TouchLed, 250);
+            //-----------
+            
             stopLerp(0);
-            obs.onAndOff(TouchLed, 2000);
-            obs.onAndOff(TouchLed, 1000);
-            obs.onAndOff(TouchLed, 500);
-            obs.onAndOff(TouchLed, 250);
-            obs.onAndOff(TouchLed, 125);
-            obs.onAndOff(TouchLed, 77);
-
-            int _30_minutes = 180000;
-            int reactivateMotionSensor_timerId = timer.setTimeout(_30_minutes, reactivateMotionSensor);
+            int _30_minutes = 1800000;
+            reactivateMotionSensor_timerId = timer.setTimeout(_30_minutes, reactivateMotionSensor);
         } else {
-            obs.onAndOff(TouchLed, 77);
-            obs.onAndOff(TouchLed, 125);
+            //-----------
             obs.onAndOff(TouchLed, 250);
-            obs.onAndOff(TouchLed, 500);
-            obs.onAndOff(TouchLed, 1000);
             obs.onAndOff(TouchLed, 2000);
+            //-----------
+
+            if(reactivateMotionSensor_timerId != -1){
+                timer.deleteTimer(reactivateMotionSensor_timerId);
+                reactivateMotionSensor_timerId = -1;
+            }
+
         }
     }   
 
@@ -119,10 +112,13 @@ void loop() {
 
 void reactivateMotionSensor(){
     deactivated = false;
+    reactivateMotionSensor_timerId = -1;
+
+    obs.flashLed(ObS_PIN, 6, 50);
+    Serial.println("30 minutes are DONE!");
 }
 
 void SignalAndActivateLeds(){
-    obs.flashLed(TrackingLed, 3, 150);
     if(rgbLeds->ledsOn == false){
         Serial.println("cycling leds");
         cycleColors();
